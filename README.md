@@ -1,3 +1,3 @@
 # Advent of code 2022
 
-01. [x] Carlories
+1. [x] Carlories

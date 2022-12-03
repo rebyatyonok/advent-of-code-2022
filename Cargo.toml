@@ -2,4 +2,5 @@
 
 members = [
     "calories",
+    "rock_paper_scissors",
 ]
