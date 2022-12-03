@@ -28,6 +28,16 @@ fn get_common_letter_for_halves(str: &str) -> Option<char> {
     None
 }
 
+fn get_same_letter_in_strings(strings: &[&str]) -> char {
+    let same_letter = strings
+        .into_iter()
+        .map(|s| HashSet::<char>::from_iter(s.chars()))
+        .reduce(|acc, s| HashSet::from_iter(acc.intersection(&s).map(|i| *i)))
+        .unwrap();
+
+    same_letter.into_iter().next().unwrap()
+}
+
 fn first_task(file: &String) -> i32 {
     file.lines()
         .map(|line| {
@@ -37,15 +47,28 @@ fn first_task(file: &String) -> i32 {
         .sum()
 }
 
+fn second_task(file: &String) -> i32 {
+    let vec = file.lines().collect::<Vec<&str>>();
+    let chunks = vec.chunks(3);
+
+    chunks
+        .map(|chunk| {
+            let same_letter = get_same_letter_in_strings(chunk);
+            get_order_num_for_char(same_letter)
+        })
+        .sum()
+}
+
 fn main() {
     let file = fs::read_to_string("rucksack_reorganization/src/input.txt").unwrap();
 
     println!("{}", first_task(&file));
+    println!("{}", second_task(&file));
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{get_common_letter_for_halves, get_order_num_for_char};
+    use crate::*;
 
     #[test]
     fn lowercase_letters_in_correct_range() {
@@ -67,5 +90,11 @@ mod tests {
     fn common_letters_works() {
         let str = "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL";
         assert_eq!(get_common_letter_for_halves(str), Some('L'));
+    }
+
+    #[test]
+    fn same_letter_works() {
+        let strings = ["qlkjkl", "qgdfgd", "qsdf"];
+        assert_eq!(get_same_letter_in_strings(&strings), 'q')
     }
 }
