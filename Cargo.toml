@@ -1,6 +1,6 @@
 [workspace]
 
 members = [
-    "calories",
+    "calorie_counting",
     "rock_paper_scissors",
 ]
