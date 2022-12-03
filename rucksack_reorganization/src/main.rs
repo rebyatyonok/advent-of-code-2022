@@ -29,14 +29,12 @@ fn get_common_letter_for_halves(str: &str) -> Option<char> {
 }
 
 fn first_task(file: &String) -> i32 {
-    let mut result = 0;
-
-    for line in file.lines() {
-        let same_letter = get_common_letter_for_halves(line).unwrap();
-        result += get_order_num_for_char(same_letter);
-    }
-
-    result
+    file.lines()
+        .map(|line| {
+            let same_letter = get_common_letter_for_halves(line).unwrap();
+            get_order_num_for_char(same_letter)
+        })
+        .sum()
 }
 
 fn main() {
