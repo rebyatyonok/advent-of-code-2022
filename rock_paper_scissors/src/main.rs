@@ -111,7 +111,7 @@ fn second_task(file: &String) -> i32 {
         let players = match expected_result {
             MatchResult::Win => get_win_shape_for(&opponents),
             MatchResult::Loose => get_loose_shape_for(&opponents),
-            MatchResult::Draw => opponents,
+            MatchResult::Draw => opponents.clone(),
         };
 
         result += get_points_for_round(&opponents, &players) + get_points_for_shape(&players);
