@@ -2,7 +2,7 @@ use std::cmp;
 use std::fs;
 
 fn main() {
-    let file = fs::read_to_string("calorie_counting/src/input.txt").unwrap();
+    let file = fs::read_to_string("day_01/src/input.txt").unwrap();
 
     println!("{}", most_calories(&file));
     println!("{:?}", top_three_sum(&file));

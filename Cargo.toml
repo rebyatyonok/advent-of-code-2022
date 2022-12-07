@@ -1,8 +1,8 @@
 [workspace]
 
 members = [
-    "calorie_counting",
-    "rock_paper_scissors",
-    "rucksack_reorganization",
-    "camp_cleanup"
+    "day_01",
+    "day_02",
+    "day_03",
+    "day_04"
 ]

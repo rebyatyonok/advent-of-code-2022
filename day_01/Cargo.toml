@@ -1,5 +1,5 @@
 [package]
-name = "calorie_counting"
+name = "day_01"
 version = "0.1.0"
 authors = ["Ivan Petrakov <rebyatyonok@yandex.com>"]
 edition = "2018"

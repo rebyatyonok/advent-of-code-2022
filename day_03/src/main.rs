@@ -60,7 +60,7 @@ fn second_task(file: &String) -> i32 {
 }
 
 fn main() {
-    let file = fs::read_to_string("rucksack_reorganization/src/input.txt").unwrap();
+    let file = fs::read_to_string("day_03/src/input.txt").unwrap();
 
     println!("{}", first_task(&file));
     println!("{}", second_task(&file));

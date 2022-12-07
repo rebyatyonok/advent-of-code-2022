@@ -3,17 +3,17 @@
 version = 3
 
 [[package]]
-name = "calorie_counting"
+name = "day_01"
 version = "0.1.0"
 
 [[package]]
-name = "camp_cleanup"
+name = "day_02"
 version = "0.1.0"
 
 [[package]]
-name = "rock_paper_scissors"
+name = "day_03"
 version = "0.1.0"
 
 [[package]]
-name = "rucksack_reorganization"
+name = "day_04"
 version = "0.1.0"

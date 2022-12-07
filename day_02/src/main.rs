@@ -75,7 +75,7 @@ fn get_match_result_from_letter(letter: &str) -> Result<MatchResult, &'static st
 }
 
 fn main() {
-    let file = fs::read_to_string("rock_paper_scissors/src/input.txt").unwrap();
+    let file = fs::read_to_string("day_02/src/input.txt").unwrap();
 
     println!("First result is {}", first_task(&file));
     println!("Second result is {}", second_task(&file));

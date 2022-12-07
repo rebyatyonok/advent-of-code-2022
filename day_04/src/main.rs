@@ -46,7 +46,7 @@ fn second_task(ranges: &Vec<TRanges>) -> usize {
 }
 
 fn main() {
-    let file = fs::read_to_string("camp_cleanup/src/input.txt").unwrap();
+    let file = fs::read_to_string("day_04/src/input.txt").unwrap();
 
     let parsed_lines = file.lines().map(|line| {
         line.split(',')
