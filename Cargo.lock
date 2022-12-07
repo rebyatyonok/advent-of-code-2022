@@ -7,6 +7,10 @@ name = "calorie_counting"
 version = "0.1.0"
 
 [[package]]
+name = "camp_cleanup"
+version = "0.1.0"
+
+[[package]]
 name = "rock_paper_scissors"
 version = "0.1.0"
 

@@ -3,5 +3,6 @@
 members = [
     "calorie_counting",
     "rock_paper_scissors",
-    "rucksack_reorganization"
+    "rucksack_reorganization",
+    "camp_cleanup"
 ]
