@@ -13,3 +13,4 @@ cargo run --bin carlorie_counting
 - [x] 3. Rucksack Reorganization
 - [x] 4. Camp Cleanup
 - [x] 5. Supply Stacks
+- [x] 6. Tuning Trouble
