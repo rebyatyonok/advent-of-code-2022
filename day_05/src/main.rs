@@ -35,8 +35,6 @@ fn parse_commands(lines: Vec<&str>) -> Vec<Command> {
         .map(|line| {
             let parts = line.split(" ").collect::<Vec<_>>();
 
-            println!("{:?}", parts);
-
             Command {
                 from: parts[3].parse::<usize>().unwrap() - 1,
                 to: parts[5].parse::<usize>().unwrap() - 1,
@@ -47,17 +45,12 @@ fn parse_commands(lines: Vec<&str>) -> Vec<Command> {
 }
 
 fn move_crate(from: &mut Vec<char>, to: &mut Vec<char>, amount: &mut i32) {
-    while amount != &0 {
-        match from.pop() {
-            Some(char) => to.push(char),
-            None => (),
-        }
-
-        *amount -= 1;
-    }
+    let split_off_index = from.len() - *amount as usize;
+    let mut movable = from.split_off(split_off_index);
+    to.append(&mut movable);
 }
 
-fn first_task(state: &mut StacksState, commands: &mut Vec<Command>) -> String {
+fn tasks(state: &mut StacksState, commands: &mut Vec<Command>) -> String {
     commands.into_iter().for_each(|command| {
         let mut from = std::mem::take(&mut state[command.from]);
         let mut to = state.get_mut(command.to).unwrap();
@@ -90,5 +83,5 @@ fn main() {
     let mut initial_state = parse_crates(initial_state_lines);
     let mut commands = parse_commands(command_lines);
 
-    println!("{}", first_task(&mut initial_state, &mut commands))
+    println!("{}", tasks(&mut initial_state, &mut commands))
 }
