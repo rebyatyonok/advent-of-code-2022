@@ -14,3 +14,4 @@ cargo run --bin carlorie_counting
 - [x] 4. Camp Cleanup
 - [x] 5. Supply Stacks
 - [x] 6. Tuning Trouble
+- [x] 7. No Space Left On Device
