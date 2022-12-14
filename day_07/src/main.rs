@@ -1,128 +1,133 @@
-use std::collections::HashMap;
+use std::fs::File;
 
-type EntriesType = HashMap<&'static str, DirInfo>;
-
-#[derive(Debug, Default)]
-struct DirInfo {
-    size: i32,
-    parent: &'static str,
+#[derive(Debug)]
+enum Node {
+    File(usize),
+    Directory(usize),
 }
 
-struct FS {
-    root: i32,
-    children: EntriesType,
-    current_name: &'static str,
+enum Command<'a> {
+    Cd(&'a str),
+    Ls,
+    AddDir(&'a str),
+    AddFile(usize),
 }
 
-impl FS {
-    fn add_size(&mut self, size: &str) {
-        let num_size = size.parse::<i32>().unwrap();
-        self.get_current().size += num_size;
-    }
+#[derive(Debug)]
+struct Directory {
+    name: String,
+    children: Vec<Node>,
+    parent: usize,
+}
 
-    fn add_dir(&mut self, name: &'static str, size: i32) {
-        let child = DirInfo {
-            size,
-            parent: self.current_name,
+#[derive(Debug)]
+struct FileSystem {
+    directories: Vec<Directory>,
+    current: usize,
+}
+
+impl FileSystem {
+    fn new() -> FileSystem {
+        let root = Directory {
+            children: vec![],
+            parent: 0,
+            name: String::from("root"),
         };
 
-        match self.children.insert(name, child) {
-            Some(_) => println!("{} already inserted", &name),
-            None => (),
+        FileSystem {
+            directories: vec![root],
+            current: 0,
         }
     }
 
-    fn get_current(&mut self) -> &mut DirInfo {
-        match self.children.get_mut(self.current_name) {
-            Some(dir) => dir,
-            None => panic!("Can't get current {}", self.current_name),
+    fn cd(&mut self, to: &str) {
+        self.current = match to {
+            "/" => 0,
+            ".." => self.directories[self.current].parent,
+            name => match self.directories.iter().position(|e| e.name == name) {
+                Some(index) => index,
+                None => panic!("Can't find a dir in {:?} to {}", self.directories, name),
+            },
         }
     }
 
-    fn go_to(&mut self, direction: &'static str) {
-        match direction {
-            ".." => {
-                let current_size = self.get_current().size;
-                self.current_name = self.get_current().parent;
-                self.get_current().size += current_size;
-            }
-            dir_name => {
-                self.current_name = dir_name;
-            }
+    fn add_file(&mut self, size: usize) {
+        self.directories[self.current]
+            .children
+            .push(Node::File(size));
+    }
+
+    fn add_directory(&mut self, name: &str) {
+        let directory = Directory {
+            name: name.to_string(),
+            children: vec![],
+            parent: self.current,
+        };
+        let len = self.directories.len();
+        self.directories.push(directory);
+        self.directories[self.current]
+            .children
+            .push(Node::Directory(len + 1));
+    }
+}
+
+fn parse_line(line: &str) -> Command {
+    let mut tokens = line.split_whitespace();
+    let first = tokens.next().expect("Line ended while first!");
+    let second = tokens.next().expect("Something");
+
+    match (first, second) {
+        ("$", "cd") => {
+            let direction = tokens.next().expect("Need direction to cd");
+            return Command::Cd(direction);
+        }
+        ("$", "ls") => Command::Ls,
+        ("dir", dirname) => Command::AddDir(dirname),
+        (size, _) => {
+            let size = size.parse::<usize>().expect("Expected parsable string");
+            return Command::AddFile(size);
         }
     }
 }
 
-fn get_entries(file: String) -> EntriesType {
-    let mut FS = FS {
-        root: 0,
-        children: HashMap::new(),
-        current_name: "/",
-    };
+fn get_dir_sizes(fs: &FileSystem) -> usize {
+    let mut sizes = Vec::with_capacity(fs.directories.len());
+    sizes.resize(fs.directories.len(), 0);
 
-    for line in file.lines() {
-        let mut tokens = line.split_whitespace();
-        let first = tokens.next().unwrap();
+    fs.directories
+        .iter()
+        .enumerate()
+        .rev()
+        .for_each(|(i, dir)| {
+            let dir_size = dir
+                .children
+                .iter()
+                .map(|child| match child {
+                    &Node::File(size) => size,
+                    &Node::Directory(index) => sizes[index],
+                })
+                .sum();
 
-        match first {
-            "$" => {
-                let command = tokens.next().unwrap();
-                let arg = tokens.next();
+            sizes[i] = dir_size;
+        });
 
-                match (command, arg) {
-                    ("cd", Some(arg)) => FS.go_to(arg),
-                    // ("cd", Some("..")) => {
-                    //     let current_dir = entries.get(&current_dir_name).unwrap();
-                    //     current_dir_name = current_dir.parent.clone()
-                    // }
-                    // ("cd", Some(dir)) => current_dir_name = String::from(dir),
-                    ("ls", _) => (),
-                    _ => panic!("Unknown command"),
-                }
-            }
-            "dir" => {
-                let dirname = tokens.next().unwrap();
-                FS.add_dir(dirname, 0)
-            }
-            size => FS.add_size(size),
-        }
-    }
-
-    FS.children
-}
-
-fn first_task(entries: &EntriesType) -> i32 {
-    entries
-        .values()
-        .filter(|e| e.size <= 100000)
-        .map(|e| e.size)
-        .sum()
+    sizes.iter().sum()
 }
 
 fn main() {
     let file = std::fs::read_to_string("day_07/src/input.txt").unwrap();
-    let entries = get_entries(file);
+    let mut fs = FileSystem::new();
 
-    println!("{}", first_task(&entries));
-}
-#[cfg(test)]
-mod tests {
-    use crate::*;
+    for line in file.lines() {
+        let command = parse_line(line);
 
-    #[test]
-    fn correct_dirs_count() {
-        let file = std::fs::read_to_string("src/test_input.txt").unwrap();
-        let entries = get_entries(file);
-
-        println!("{:?}", entries);
-        assert_eq!(entries.values().len(), 4);
+        match command {
+            Command::Cd(path) => fs.cd(path),
+            Command::Ls => (),
+            Command::AddDir(dirname) => fs.add_directory(dirname),
+            Command::AddFile(size) => fs.add_file(size),
+        }
     }
 
-    #[test]
-    fn correct_output() {
-        let file = std::fs::read_to_string("src/test_input.txt").unwrap();
-        let entries = get_entries(file);
-
-        assert_eq!(first_task(&entries), 95437);
-    }
+    println!("{:#?}", get_dir_sizes(&fs));
 }
