@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Debug, PartialEq, Eq, Hash)]
 enum Node {
     File(usize),
@@ -15,6 +17,7 @@ enum Command<'a> {
 struct Directory {
     children: std::collections::HashMap<String, Node>,
     parent: usize,
+    name: String,
 }
 
 #[derive(Debug)]
@@ -28,6 +31,7 @@ impl FileSystem {
         let root = Directory {
             children: Default::default(),
             parent: 0,
+            name: "root".to_string(),
         };
 
         FileSystem {
@@ -45,7 +49,7 @@ impl FileSystem {
                 .get(name)
                 .and_then(|node| match node {
                     Node::File { .. } => panic!("Trying to cd to file with name {}", name),
-                    Node::Directory(dir) => Some(*dir),
+                    Node::Directory(index) => Some(*index),
                 })
                 .unwrap(),
             // name => match self.directories.iter().position(|e| e.name == name) {
@@ -66,6 +70,7 @@ impl FileSystem {
         let directory = Directory {
             children: Default::default(),
             parent: self.current,
+            name: name.to_string(),
         };
         self.directories.push(directory);
         let index = self.directories.len() - 1;
@@ -106,13 +111,18 @@ fn get_dir_size(dir: &Directory, fs: &FileSystem) -> usize {
         .sum()
 }
 
-fn get_dir_sizes(fs: &FileSystem) -> Vec<usize> {
+fn get_dir_sizes(fs: &FileSystem) -> HashMap<String, usize> {
+    let mut sizes = HashMap::new();
+
     fs.directories
         .iter()
         .enumerate()
         .rev()
-        .map(|(_, dir)| get_dir_size(dir, fs))
-        .collect()
+        .for_each(|(_, dir)| {
+            sizes.insert(dir.name.clone(), get_dir_size(dir, fs));
+        });
+
+    sizes
 }
 
 fn main() {
@@ -130,9 +140,22 @@ fn main() {
         }
     }
 
-    let limit = 100000 as usize;
+    let all_sizes = get_dir_sizes(&fs);
 
-    let first_task: usize = get_dir_sizes(&fs).into_iter().filter(|e| e < &limit).sum();
+    // let limit = 100000 as usize;
+    let total = 70000000;
+    let required_free = 30000000;
+    let current_free: usize = total - all_sizes["root"];
 
-    println!("{:#?}", first_task);
+    // let first_task: usize = get_dir_sizes(&fs).values().into_iter().filter(|e| e < &limit).sum();
+    // println!("{:#?}", first_task);
+
+    let second_task: &usize = all_sizes
+        .values()
+        .into_iter()
+        .filter(|e| *e >= &(required_free - current_free))
+        .min()
+        .expect("Can't find a max");
+
+    println!("{}", second_task)
 }
