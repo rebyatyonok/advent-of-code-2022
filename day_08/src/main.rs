@@ -45,6 +45,77 @@ fn get_total_visibility(horizontal: Matrix, vertical: Matrix) -> Matrix {
     result
 }
 
+fn get_visibility_for_tree(matrix: &Vec<Vec<u32>>, position: (usize, usize)) -> i32 {
+    let (y, x) = position;
+    let current = matrix[y][x];
+
+    if x == 0 || y == 0 {
+        return 0;
+    }
+
+    // to right
+    let mut right = 0;
+    let mut right_x = x + 1;
+    while right_x < matrix.first().expect("Can't take first").len() {
+        right += 1;
+
+        if matrix[y][right_x] >= current {
+            break;
+        } else {
+            right_x += 1;
+        }
+    }
+
+    // to left
+    let mut left = 0;
+    let mut left_x = x - 1;
+    loop {
+        left += 1;
+
+        if matrix[y][left_x] >= current {
+            break;
+        }
+
+        if left_x > 0 {
+            left_x -= 1;
+        } else {
+            break;
+        }
+    }
+
+    // up
+    let mut up = 0;
+    let mut up_y = y - 1;
+    loop {
+        up += 1;
+
+        if matrix[up_y][x] >= current {
+            break;
+        }
+
+        if up_y > 0 {
+            up_y -= 1;
+        } else {
+            break;
+        }
+    }
+
+    // down
+    let mut down = 0;
+    let mut down_y = y + 1;
+    while down_y < matrix.len() {
+        down += 1;
+
+        if matrix[down_y][x] >= current {
+            break;
+        }
+
+        down_y += 1;
+    }
+
+    right * left * up * down
+}
+
 fn main() {
     let file = std::fs::read_to_string("day_08/src/input.txt").unwrap();
     let matrix = to_matrix(file);
@@ -52,12 +123,20 @@ fn main() {
     let vertical_visibility = get_vertical_view_matrix(&matrix);
     let total_visibility = get_total_visibility(horizontal_visibility, vertical_visibility);
 
-    // println!("{:?}", vertical_visibility);
-
     let first_task: usize = total_visibility
         .iter()
         .map(|line| line.iter().filter(|is_visible| **is_visible).count())
         .sum();
+
+    let mut visibilities = vec![];
+
+    for (y, line) in matrix.iter().enumerate() {
+        for (x, _) in line.iter().enumerate() {
+            visibilities.push(get_visibility_for_tree(&matrix, (y, x)));
+        }
+    }
+
+    println!("{:?}", visibilities.iter().max());
 
     println!("{}", first_task);
 }
