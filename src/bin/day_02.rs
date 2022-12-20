@@ -81,17 +81,17 @@ fn main() {
     println!("Second result is {}", second_task(&file));
 }
 
-fn first_task(file: &String) -> i32 {
+fn first_task(file: &str) -> i32 {
     let mut result = 0;
 
     for line in file.lines() {
         let line_of_shapes = line
-            .split(" ")
+            .split_whitespace()
             .map(|x| get_shape_from_letter(x).unwrap())
             .collect::<Vec<Shape>>();
 
         if let [opponents, yours] = &line_of_shapes[..] {
-            result += get_points_for_round(&opponents, &yours) + get_points_for_shape(&yours);
+            result += get_points_for_round(opponents, yours) + get_points_for_shape(yours);
         } else {
             panic!("Something went wrong!")
         }
@@ -100,18 +100,18 @@ fn first_task(file: &String) -> i32 {
     result
 }
 
-fn second_task(file: &String) -> i32 {
+fn second_task(file: &str) -> i32 {
     let mut result = 0;
 
     for line in file.lines() {
-        let letters = line.split(" ").collect::<Vec<&str>>();
+        let letters = line.split_whitespace().collect::<Vec<&str>>();
         let opponents = get_shape_from_letter(letters[0]).unwrap();
         let expected_result = get_match_result_from_letter(letters[1]).unwrap();
 
         let players = match expected_result {
             MatchResult::Win => get_win_shape_for(&opponents),
             MatchResult::Loose => get_loose_shape_for(&opponents),
-            MatchResult::Draw => opponents.clone(),
+            MatchResult::Draw => opponents,
         };
 
         result += get_points_for_round(&opponents, &players) + get_points_for_shape(&players);

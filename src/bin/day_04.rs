@@ -37,7 +37,7 @@ fn first_task(ranges: &Vec<TRanges>) -> usize {
         .count()
 }
 
-fn second_task(ranges: &Vec<TRanges>) -> usize {
+fn second_task(ranges: &[TRanges]) -> usize {
     ranges
         .iter()
         .filter(|x| {

@@ -92,13 +92,13 @@ fn parse_line(line: &str) -> Command {
     match (first, second) {
         ("$", "cd") => {
             let direction = tokens.next().expect("Need direction to cd");
-            return Command::Cd(direction);
+            Command::Cd(direction)
         }
         ("$", "ls") => Command::Ls,
         ("dir", dirname) => Command::AddDir(dirname),
         (size, name) => {
             let size = size.parse::<usize>().expect("Expected parsable string");
-            return Command::AddFile(size, name);
+            Command::AddFile(size, name)
         }
     }
 }
@@ -107,7 +107,7 @@ fn get_dir_size(dir: &Directory, fs: &FileSystem) -> usize {
     dir.children
         .iter()
         .map(|(_, child)| match child {
-            &Node::File(size) => size,
+            Node::File(size) => *size,
             &Node::Directory(index) => get_dir_size(&fs.directories[index], fs),
         })
         .sum()

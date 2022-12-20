@@ -1,4 +1,4 @@
-use std::{char, collections::HashSet, fs};
+use std::{char, collections::HashSet};
 
 use advent_of_code_2022::get_input_file;
 
@@ -20,10 +20,8 @@ fn get_common_letter_for_halves(str: &str) -> Option<char> {
     for (i, char) in str.chars().enumerate() {
         if i < middle {
             first_half.insert(char);
-        } else {
-            if first_half.contains(&char) {
-                return Some(char);
-            }
+        } else if first_half.contains(&char) {
+            return Some(char);
         }
     }
 
@@ -32,15 +30,15 @@ fn get_common_letter_for_halves(str: &str) -> Option<char> {
 
 fn get_same_letter_in_strings(strings: &[&str]) -> char {
     let same_letter = strings
-        .into_iter()
+        .iter()
         .map(|s| HashSet::<char>::from_iter(s.chars()))
-        .reduce(|acc, s| HashSet::from_iter(acc.intersection(&s).map(|i| *i)))
+        .reduce(|acc, s| HashSet::from_iter(acc.intersection(&s).copied()))
         .unwrap();
 
     same_letter.into_iter().next().unwrap()
 }
 
-fn first_task(file: &String) -> i32 {
+fn first_task(file: &str) -> i32 {
     file.lines()
         .map(|line| {
             let same_letter = get_common_letter_for_halves(line).unwrap();
@@ -49,7 +47,7 @@ fn first_task(file: &String) -> i32 {
         .sum()
 }
 
-fn second_task(file: &String) -> i32 {
+fn second_task(file: &str) -> i32 {
     let vec = file.lines().collect::<Vec<&str>>();
     let chunks = vec.chunks(3);
 

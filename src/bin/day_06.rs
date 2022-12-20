@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fs};
+use std::collections::HashSet;
 
 use advent_of_code_2022::get_input_file;
 

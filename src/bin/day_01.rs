@@ -8,12 +8,12 @@ fn main() {
     println!("{:?}", top_three_sum(&file));
 }
 
-fn most_calories(file: &String) -> i32 {
+fn most_calories(file: &str) -> i32 {
     let mut most = 0;
     let mut current = 0;
 
     for line in file.lines() {
-        if line.len() > 0 {
+        if !line.is_empty() {
             current += line.parse::<i32>().unwrap_or(0);
         } else {
             most = cmp::max(most, current);
@@ -24,12 +24,12 @@ fn most_calories(file: &String) -> i32 {
     most
 }
 
-fn top_three_sum(file: &String) -> i32 {
+fn top_three_sum(file: &str) -> i32 {
     let mut sum = 0;
     let mut result = vec![0, 0, 0];
 
     file.lines().for_each(|line| {
-        if line.len() > 0 {
+        if !line.is_empty() {
             sum += line.parse::<i32>().unwrap_or(0);
         } else {
             result = result
