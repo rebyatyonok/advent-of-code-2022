@@ -1,5 +1,7 @@
 use std::{char, collections::HashSet, fs};
 
+use advent_of_code_2022::get_input_file;
+
 /// Get order for char in a task-specific range
 fn get_order_num_for_char(char: char) -> i32 {
     if char.is_uppercase() {
@@ -60,7 +62,7 @@ fn second_task(file: &String) -> i32 {
 }
 
 fn main() {
-    let file = fs::read_to_string("day_03/src/input.txt").unwrap();
+    let file = get_input_file();
 
     println!("{}", first_task(&file));
     println!("{}", second_task(&file));

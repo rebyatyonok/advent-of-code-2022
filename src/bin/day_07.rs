@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use advent_of_code_2022::get_input_file;
+
 #[derive(Debug, PartialEq, Eq, Hash)]
 enum Node {
     File(usize),
@@ -126,7 +128,7 @@ fn get_dir_sizes(fs: &FileSystem) -> HashMap<String, usize> {
 }
 
 fn main() {
-    let file = std::fs::read_to_string("day_07/src/input.txt").unwrap();
+    let file = get_input_file();
     let mut fs = FileSystem::new();
 
     for line in file.lines() {

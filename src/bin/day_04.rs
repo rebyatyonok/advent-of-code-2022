@@ -1,5 +1,7 @@
 use std::fs;
 
+use advent_of_code_2022::get_input_file;
+
 type TRange = (i32, i32);
 type TRanges = (TRange, TRange);
 
@@ -46,7 +48,7 @@ fn second_task(ranges: &Vec<TRanges>) -> usize {
 }
 
 fn main() {
-    let file = fs::read_to_string("day_04/src/input.txt").unwrap();
+    let file = get_input_file();
 
     let parsed_lines = file.lines().map(|line| {
         line.split(',')

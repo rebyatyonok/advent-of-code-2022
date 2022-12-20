@@ -1,4 +1,4 @@
-use std::fs;
+use advent_of_code_2022::get_input_file;
 use std::str;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -75,7 +75,7 @@ fn get_match_result_from_letter(letter: &str) -> Result<MatchResult, &'static st
 }
 
 fn main() {
-    let file = fs::read_to_string("day_02/src/input.txt").unwrap();
+    let file = get_input_file();
 
     println!("First result is {}", first_task(&file));
     println!("Second result is {}", second_task(&file));

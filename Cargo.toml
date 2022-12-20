@@ -1,13 +1,5 @@
-[workspace]
-
-members = [
-    "day_01",
-    "day_02",
-    "day_03",
-    "day_04",
-    "day_05",
-    "day_06",
-    "day_07",
-    "day_08",
-    "day_09"
-]
+[package]
+name = "advent_of_code_2022"
+version = "1.0.0"
+edition = "2021"
+publish = false

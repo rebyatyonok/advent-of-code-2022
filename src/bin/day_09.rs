@@ -1,5 +1,7 @@
 use std::{cmp::Ordering, collections::HashSet};
 
+use advent_of_code_2022::get_input_file;
+
 #[derive(Debug, PartialEq, Eq)]
 enum Motion {
     Up,
@@ -98,7 +100,7 @@ fn line_to_motion_with_amount(line: &str) -> (Motion, i32) {
 }
 
 fn main() {
-    let file = std::fs::read_to_string("day_09/src/input.txt").unwrap();
+    let file = get_input_file();
     let mut rope = Rope::new();
 
     file.lines()

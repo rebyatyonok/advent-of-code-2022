@@ -1,5 +1,7 @@
 use std::{collections::HashSet, fs};
 
+use advent_of_code_2022::get_input_file;
+
 fn is_unique(string: &str) -> bool {
     let mut set = HashSet::new();
 
@@ -31,7 +33,7 @@ fn find_unique_substring_index(string: &String, substring_length: usize) -> i32 
 }
 
 fn main() {
-    let file = fs::read_to_string("day_06/src/input.txt").unwrap();
+    let file = get_input_file();
 
     let first_marker = find_unique_substring_index(&file, 4);
     println!("{}", first_marker);

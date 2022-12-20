@@ -1,4 +1,4 @@
-use std::fs;
+use advent_of_code_2022::get_input_file;
 
 type StacksState = Vec<Vec<char>>;
 struct Command {
@@ -14,7 +14,7 @@ fn parse_crates(lines: Vec<&str>) -> StacksState {
         let chars = line.chars().collect::<Vec<char>>();
 
         chars.chunks(4).enumerate().for_each(|(i, e)| {
-            if crates_by_stacks.get(i) == None {
+            if crates_by_stacks.get(i).is_none() {
                 crates_by_stacks.insert(i, Vec::new());
             };
 
@@ -67,7 +67,7 @@ fn tasks(state: &mut StacksState, commands: &mut Vec<Command>) -> String {
 }
 
 fn main() {
-    let file = fs::read_to_string("day_05/src/input.txt").unwrap();
+    let file = get_input_file();
     let mut initial_state_lines: Vec<&str> = Vec::new();
     let mut command_lines: Vec<&str> = Vec::new();
 

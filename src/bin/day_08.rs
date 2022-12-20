@@ -1,4 +1,4 @@
-use day_08::{get_are_trees_visible, to_matrix};
+use advent_of_code_2022::get_input_file;
 
 type Matrix<T = bool> = Vec<Vec<T>>;
 
@@ -117,7 +117,7 @@ fn get_visibility_for_tree(matrix: &Vec<Vec<u32>>, position: (usize, usize)) -> 
 }
 
 fn main() {
-    let file = std::fs::read_to_string("day_08/src/input.txt").unwrap();
+    let file = get_input_file();
     let matrix = to_matrix(file);
     let horizontal_visibility = get_horizontal_view_matrix(&matrix);
     let vertical_visibility = get_vertical_view_matrix(&matrix);
@@ -139,4 +139,44 @@ fn main() {
     println!("{:?}", visibilities.iter().max());
 
     println!("{}", first_task);
+}
+
+pub fn get_are_trees_visible(line: &Vec<u32>) -> Vec<bool> {
+    let mut result: Vec<bool> = Vec::with_capacity(line.len());
+    result.resize(line.len(), false);
+
+    for (i, h) in line.iter().enumerate() {
+        let height = *h;
+        let max_start = *line[..i].iter().max().unwrap_or(&0);
+        let max_end = *line[i + 1..].iter().max().unwrap_or(&0);
+
+        let visible_from_start = height > max_start;
+        let visible_from_end = height > max_end;
+
+        if i == 0 || i == line.len() - 1 {
+            result[i] = true;
+            continue;
+        }
+
+        if visible_from_end || visible_from_start {
+            result[i] = true;
+        }
+    }
+
+    result
+}
+
+pub fn to_matrix(file: String) -> Vec<Vec<u32>> {
+    file.lines()
+        .into_iter()
+        .map(|line| {
+            line.chars()
+                .into_iter()
+                .map(|h| match h.to_digit(10) {
+                    Some(num) => num,
+                    None => panic!("Can not parse num {h:?}"),
+                })
+                .collect()
+        })
+        .collect()
 }

@@ -1,8 +1,8 @@
+use advent_of_code_2022::get_input_file;
 use std::cmp;
-use std::fs;
 
 fn main() {
-    let file = fs::read_to_string("day_01/src/input.txt").unwrap();
+    let file = get_input_file();
 
     println!("{}", most_calories(&file));
     println!("{:?}", top_three_sum(&file));
