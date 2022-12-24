@@ -7,6 +7,47 @@ enum Command {
     Noop,
 }
 
+struct Crt {
+    screen: Vec<Vec<char>>,
+    pointer: (i32, i32),
+}
+
+impl Crt {
+    fn new() -> Crt {
+        let mut screen = vec![];
+        for _ in 0..6 {
+            let mut row = vec![];
+            row.resize(40, ' ');
+            screen.push(row);
+        }
+        Crt {
+            screen,
+            pointer: (0, 0),
+        }
+    }
+
+    fn move_pointer_to_next(&mut self) {
+        let (y, x) = self.pointer;
+
+        if x >= 39 {
+            self.pointer = (y + 1, 0);
+        } else {
+            self.pointer = (y, x + 1);
+        }
+    }
+
+    fn set_lit_px(&mut self, x: i32, y: i32) {
+        self.screen[y as usize][x as usize] = '#'
+    }
+
+    fn print_screen(&self) {
+        self.screen
+            .iter()
+            .map(|line| line.iter().collect())
+            .for_each(|line: String| println!("{:?}", line));
+    }
+}
+
 fn line_to_command(line: &str) -> Command {
     let mut tokens = line.split_whitespace();
     let command = tokens.next().unwrap();
@@ -57,9 +98,52 @@ fn first_task(file: &str) -> i32 {
         .sum()
 }
 
+fn second_task(file: &str) -> Crt {
+    let mut skip = 0;
+    let mut add = 0;
+    let mut register = 1;
+    let mut crt = Crt::new();
+    let mut lines = file.lines();
+
+    loop {
+        let (y, x) = crt.pointer;
+
+        if skip == 0 {
+            register += add;
+            add = 0;
+
+            let line = lines.next();
+
+            if line.is_none() {
+                break;
+            }
+
+            match line_to_command(line.unwrap()) {
+                Command::Add(amount) => {
+                    skip += 2;
+                    add += amount;
+                }
+                Command::Noop => skip += 1,
+            }
+        }
+
+        if x == register || x == register - 1 || x == register + 1 {
+            crt.set_lit_px(x, y);
+        }
+
+        skip -= 1;
+        crt.move_pointer_to_next();
+    }
+
+    crt
+}
+
 fn main() {
     let file = get_input_file();
 
     let first = first_task(&file);
     println!("{first}");
+
+    let crt = second_task(&file);
+    crt.print_screen()
 }
