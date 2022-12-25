@@ -1,7 +1,7 @@
 #[derive(Debug)]
 enum Operation {
-    Add(i64),
-    Multiply(i64),
+    Add(u64),
+    Multiply(u64),
     Square,
 }
 
@@ -22,27 +22,27 @@ impl Operation {
         }
     }
 
-    fn exec(&self, item: i64) -> i64 {
+    fn exec(&self, item: u64) -> u64 {
         match self {
             Operation::Add(x) => item + x,
             Operation::Multiply(x) => item * x,
-            Operation::Square => item * item,
+            Operation::Square => item.pow(2),
         }
     }
 }
 
 #[derive(Debug)]
 struct Test {
-    value: i64,
+    value: u64,
     if_true: usize,
     if_false: usize,
 }
 
 #[derive(Debug)]
 struct Monkey {
-    items: Vec<i64>,
+    items: Vec<u64>,
     operation: Operation,
-    inspection_count: i64,
+    inspection_count: u64,
     test: Test,
 }
 
@@ -55,7 +55,7 @@ impl Monkey {
         let items = next_line()
             .split_whitespace()
             .skip(2)
-            .map(|x| x.trim_end_matches(',').parse::<i64>().unwrap())
+            .map(|x| x.trim_end_matches(',').parse::<u64>().unwrap())
             .collect();
 
         let operation = Operation::from_line(next_line());
@@ -89,12 +89,13 @@ impl Monkey {
         }
     }
 
-    fn inspect(&mut self, item: i64) -> (usize, i64) {
+    fn inspect(&mut self, item: u64, hcd: u64) -> (usize, u64) {
         self.inspection_count += 1;
 
+        println!("{item:?}");
         let mut inspected_item = self.operation.exec(item);
 
-        inspected_item /= 3;
+        inspected_item %= hcd; // do not need that for second task
 
         let monkey_to_pass = if inspected_item % self.test.value == 0 {
             self.test.if_true
@@ -105,7 +106,7 @@ impl Monkey {
         (monkey_to_pass, inspected_item)
     }
 
-    fn add_items(&mut self, items: Option<&mut Vec<i64>>) {
+    fn add_items(&mut self, items: Option<&mut Vec<u64>>) {
         if let Some(items) = items {
             self.items.append(items);
         }
@@ -116,14 +117,16 @@ fn main() {
     let file = advent_of_code_2022::get_input_file();
     let mut monkeys: Vec<Monkey> = file.split("\n\n").map(Monkey::new).collect();
 
-    let mut items_in_the_air = std::collections::HashMap::<usize, Vec<i64>>::new();
+    let mut items_in_the_air = std::collections::HashMap::<usize, Vec<u64>>::new();
 
-    for _ in 0..20 {
+    let hcd = monkeys.iter().fold(1, |acc, m| acc * m.test.value);
+
+    for _ in 0..10000 {
         for (i, monkey) in monkeys.iter_mut().enumerate() {
             monkey.add_items(items_in_the_air.remove(&i).as_mut());
 
             while let Some(item) = monkey.items.pop() {
-                let (j, item) = monkey.inspect(item);
+                let (j, item) = monkey.inspect(item, hcd);
 
                 items_in_the_air.entry(j).or_default().push(item);
             }

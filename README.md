@@ -18,3 +18,4 @@ cargo run --bin day_01 input/day_01.txt
 - [x] 8. Treetop Tree House
 - [x] 9. Rope Bridge
 - [x] 10. Cathode-Ray Tube
+- [x] 11. Monkey in the Middle
