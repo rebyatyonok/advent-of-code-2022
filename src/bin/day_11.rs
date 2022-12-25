@@ -1,7 +1,7 @@
 #[derive(Debug)]
 enum Operation {
-    Add(i32),
-    Multiply(i32),
+    Add(i64),
+    Multiply(i64),
     Square,
 }
 
@@ -22,7 +22,7 @@ impl Operation {
         }
     }
 
-    fn exec(&self, item: i32) -> i32 {
+    fn exec(&self, item: i64) -> i64 {
         match self {
             Operation::Add(x) => item + x,
             Operation::Multiply(x) => item * x,
@@ -33,16 +33,16 @@ impl Operation {
 
 #[derive(Debug)]
 struct Test {
-    value: i32,
+    value: i64,
     if_true: usize,
     if_false: usize,
 }
 
 #[derive(Debug)]
 struct Monkey {
-    items: Vec<i32>,
+    items: Vec<i64>,
     operation: Operation,
-    inspection_count: i32,
+    inspection_count: i64,
     test: Test,
 }
 
@@ -55,7 +55,7 @@ impl Monkey {
         let items = next_line()
             .split_whitespace()
             .skip(2)
-            .map(|x| x.trim_end_matches(',').parse::<i32>().unwrap())
+            .map(|x| x.trim_end_matches(',').parse::<i64>().unwrap())
             .collect();
 
         let operation = Operation::from_line(next_line());
@@ -89,13 +89,14 @@ impl Monkey {
         }
     }
 
-    fn inspect(&mut self) -> (usize, i32) {
+    fn inspect(&mut self, item: i64) -> (usize, i64) {
         self.inspection_count += 1;
-        let item = self.items.remove(0);
 
-        let inspected_item = self.get_value_after_inspection(item);
+        let mut inspected_item = self.operation.exec(item);
 
-        let monkey_to_pass = if item % self.test.value == 0 {
+        inspected_item /= 3;
+
+        let monkey_to_pass = if inspected_item % self.test.value == 0 {
             self.test.if_true
         } else {
             self.test.if_false
@@ -104,18 +105,37 @@ impl Monkey {
         (monkey_to_pass, inspected_item)
     }
 
-    fn get_value_after_inspection(&self, item: i32) -> i32 {
-        (self.operation.exec(item) as f32 / 3_f32).floor() as i32
-    }
-
-    fn add_item(&mut self, item: i32) {
-        self.items.push(item);
+    fn add_items(&mut self, items: Option<&mut Vec<i64>>) {
+        if let Some(items) = items {
+            self.items.append(items);
+        }
     }
 }
 
 fn main() {
     let file = advent_of_code_2022::get_input_file();
-    let monkeys: Vec<Monkey> = file.split("\n\n").map(Monkey::new).collect();
+    let mut monkeys: Vec<Monkey> = file.split("\n\n").map(Monkey::new).collect();
 
-    println!("{monkeys:#?}");
+    let mut items_in_the_air = std::collections::HashMap::<usize, Vec<i64>>::new();
+
+    for _ in 0..20 {
+        for (i, monkey) in monkeys.iter_mut().enumerate() {
+            monkey.add_items(items_in_the_air.remove(&i).as_mut());
+
+            while let Some(item) = monkey.items.pop() {
+                let (j, item) = monkey.inspect(item);
+
+                items_in_the_air.entry(j).or_default().push(item);
+            }
+        }
+    }
+
+    monkeys.sort_by(|m1, m2| m2.inspection_count.cmp(&m1.inspection_count));
+
+    let first_task = monkeys
+        .iter()
+        .take(2)
+        .fold(1, |acc, m| m.inspection_count * acc);
+
+    println!("{first_task:#?}");
 }
