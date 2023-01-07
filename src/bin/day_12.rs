@@ -7,7 +7,6 @@ use std::{
 struct Point {
     x: usize,
     y: usize,
-    priority: i32,
     value: u8,
 }
 
@@ -16,7 +15,6 @@ impl Point {
         Point {
             x,
             y,
-            priority: 0,
             value: char_to_value(char),
         }
     }
@@ -84,7 +82,7 @@ impl Grid {
     }
 }
 
-fn get_path(start: &Point, end: &Point, grid: &Grid) -> Vec<Point> {
+fn get_path(start: &Point, end: &Point, grid: &Grid) -> Option<Vec<Point>> {
     let mut transitions = HashMap::new();
     let mut frontier = VecDeque::new();
     let mut visited: HashSet<Point> = HashSet::new();
@@ -107,6 +105,10 @@ fn get_path(start: &Point, end: &Point, grid: &Grid) -> Vec<Point> {
         }
     }
 
+    if !transitions.contains_key(end) {
+        return None;
+    }
+
     let mut current = *end;
     let mut path = vec![];
 
@@ -115,7 +117,7 @@ fn get_path(start: &Point, end: &Point, grid: &Grid) -> Vec<Point> {
         current = transitions[&current].unwrap();
     }
 
-    path
+    Some(path)
 }
 
 fn main() {
@@ -125,9 +127,26 @@ fn main() {
     let start = grid.get_start_position();
     let end = grid.get_end_position();
 
-    let path = get_path(&start, &end, &grid);
+    let first_task = get_path(&start, &end, &grid);
 
-    println!("{:?}", path.len());
+    println!("{:?}", first_task.unwrap().len());
+
+    // TODO
+    // we can go from end to the first 'a' char, it should be much faster
+    let shortest = grid
+        .grid
+        .iter()
+        .flatten()
+        .filter_map(|point| {
+            if point.value == 1 {
+                get_path(point, &end, &grid).map(|path| path.len())
+            } else {
+                None
+            }
+        })
+        .min();
+
+    println!("{}", shortest.unwrap());
 }
 
 fn char_to_value(char: char) -> u8 {
