@@ -1,5 +1,5 @@
 use std::{
-    collections::{BinaryHeap, HashMap, HashSet},
+    collections::{HashMap, HashSet, VecDeque},
     hash::Hash,
 };
 
@@ -9,18 +9,6 @@ struct Point {
     y: usize,
     priority: i32,
     value: u8,
-}
-
-impl PartialOrd for Point {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.value.cmp(&other.value))
-    }
-}
-
-impl Ord for Point {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.partial_cmp(other).unwrap()
-    }
 }
 
 impl Point {
@@ -97,27 +85,23 @@ impl Grid {
 }
 
 fn get_path(start: &Point, end: &Point, grid: &Grid) -> Vec<Point> {
-    let mut came_from = HashMap::new();
-    let mut frontier = BinaryHeap::new();
+    let mut transitions = HashMap::new();
+    let mut frontier = VecDeque::new();
     let mut visited: HashSet<Point> = HashSet::new();
 
-    frontier.push(*start);
-    came_from.insert(*start, None);
+    frontier.push_back(*start);
+    transitions.insert(*start, None);
 
-    while let Some(current) = frontier.pop() {
+    while let Some(current) = frontier.pop_front() {
         let neighbors = grid.get_neighbors(&current);
 
         for next in neighbors.into_iter() {
-            let is_visited = visited.get(&next).is_some();
-            let is_value_ok = if next >= current {
-                next.value.abs_diff(current.value) <= 1
-            } else {
-                true
-            };
+            let is_visited = visited.contains(&next);
+            let is_value_ok = next.value <= current.value + 1;
 
             if !is_visited && is_value_ok {
-                frontier.push(next);
-                came_from.insert(next, Some(current));
+                frontier.push_back(next);
+                transitions.insert(next, Some(current));
                 visited.insert(next);
             }
         }
@@ -128,7 +112,7 @@ fn get_path(start: &Point, end: &Point, grid: &Grid) -> Vec<Point> {
 
     while current != *start {
         path.push(current);
-        current = came_from[&current].unwrap();
+        current = transitions[&current].unwrap();
     }
 
     path
